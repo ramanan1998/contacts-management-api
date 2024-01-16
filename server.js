@@ -11,6 +11,8 @@ app.use(express.json());
 
 app.use("/api/contacts", require("./routes/contact-routes"));
 
+app.use("/api/users", require("./routes/user-routes"));
+
 app.use(errorHandler);
 
 app.listen(port, () => console.log(`server running on port ${port}`));

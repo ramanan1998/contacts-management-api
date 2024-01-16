@@ -3,10 +3,10 @@ const ContactModel = require("../models/contact-model");
 
 // Get all contacts
 // route GET : /api/contacts
-// access: public
+// access: private
 const getAllContacts = async (req, res) => {
     try{
-        const contacts = await ContactModel.find();   
+        const contacts = await ContactModel.find({ userId: req.user.id });   
         res.status(200).json(contacts)
     }catch(error){
         throw error;
@@ -16,12 +16,12 @@ const getAllContacts = async (req, res) => {
 
 // Get individual contacts
 // route GET : /api/contacts/:id
-// access: public
+// access: private
 const getIndividualContact = asyncHandler(async (req, res) => {
     try{
         const contacts = await ContactModel.findById(req.params.id);
 
-        if(!contacts){
+        if(!contacts || contacts.userId.toString() !== req.user.id){
             res.status(404);
             throw new Error("Contact not found");
         }
@@ -35,7 +35,7 @@ const getIndividualContact = asyncHandler(async (req, res) => {
 
 // create new contact
 // route POST : /api/contacts
-// access: public
+// access: private
 const createNewContact = async(req, res) => {
     
     const { name, gender, email, phone } = req.body;
@@ -50,7 +50,8 @@ const createNewContact = async(req, res) => {
             name,
             gender,
             email,
-            phone
+            phone,
+            userId: req.user.id
         })
 
         res.status(201);
@@ -64,13 +65,13 @@ const createNewContact = async(req, res) => {
 
 // update contact
 // route PUT : /api/contacts/:id
-// access: public
+// access: private
 const updateContact = asyncHandler(async (req, res) => {
 
     try{
         const contacts = await ContactModel.findById(req.params.id);
 
-        if(!contacts){
+        if(!contacts || contacts.userId.toString() !== req.user.id){
             res.status(404);
             throw new Error("Contact not found");
         }
@@ -85,12 +86,12 @@ const updateContact = asyncHandler(async (req, res) => {
 
 // delete contact
 // route DELETE : /api/contacts/:id
-// access: public
+// access: private
 const deleteContact = asyncHandler(async (req, res) => {
     try{
         const contacts = await ContactModel.findById(req.params.id);
 
-        if(!contacts){
+        if(!contacts || contacts.userId.toString() !== req.user.id){
             res.status(404);
             throw new Error("Contact not found");
         }
